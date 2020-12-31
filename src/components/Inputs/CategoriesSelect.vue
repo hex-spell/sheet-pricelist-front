@@ -1,14 +1,14 @@
 <template>
   <select name="category" id="category" v-model="state.category" @change="onChange">
+    <option value="" selected>Todas</option>
     <option
       v-for="category in props.categories"
-      :value="category.value"
-      :key="category.value"
+      :value="category.id"
+      :key="category.id"
     >
       {{ category.name }}
     </option>
   </select>
-  {{ state.category }}
 </template>
 
 <script>
@@ -21,10 +21,10 @@ export default {
   },
   setup(props, ctx) {
     const state = reactive({
-      category: 1,
+      category: "",
     });
     function onChange(){
-      ctx.emit('change',state.category);
+      ctx.emit('changeCategory',state.category);
     }
     return { state, props, onChange };
   },

@@ -2,7 +2,7 @@
   <nav>
       <ul>
           <li>
-              hola
+              sheet-pricelist
           </li>
       </ul>
   </nav>

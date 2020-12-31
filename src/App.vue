@@ -1,32 +1,46 @@
 <template>
   <Navbar />
-  <CategoriesSelect :categories="state.categories" @change="onChangeCategory"/>
+  <CategoriesSelect :categories="state.categories" @changeCategory="onChangeCategory" />
+  <ItemList :items="state.items" />
 </template>
 
 <script>
-import Navbar from './components/Layout/Navbar.vue';
-import CategoriesSelect from './components/Inputs/CategoriesSelect.vue';
-import { reactive } from 'vue';
+import Navbar from "./components/Layout/Navbar.vue";
+import CategoriesSelect from "./components/Inputs/CategoriesSelect.vue";
+import ItemList from "./components/Items/ItemList.vue";
+import { reactive } from "vue";
+import useFetch from "./hooks/useFetch";
+import config from './config';
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     Navbar,
-    CategoriesSelect
+    CategoriesSelect,
+    ItemList
   },
-  setup(){
+  setup() {
     const state = reactive({
-      categories: [
-        {name:"hola",value:1},
-        {name:"mundo",value:2}
-      ]
+      categories: [],
+      items: []
     });
-    function onChangeCategory(category){
-      alert(category);
+    const { response: categories } = useFetch(`${config.aws_api}/categories`, {});
+    if (categories) {
+      state.categories = categories;
     }
-    return { state, onChangeCategory }
-  }
-}
+    const { response: items } = useFetch(`${config.aws_api}/items`, {});
+    if (items) {
+      state.items = items;
+    }
+    function onChangeCategory(category) {
+      const { response: items } = useFetch(`${config.aws_api}/items?categoryId=${category}`, {});
+      if (items) {
+        state.items = items;
+      }
+    }
+    return { state, onChangeCategory };
+  },
+};
 </script>
 
 <style>
