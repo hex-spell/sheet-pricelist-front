@@ -1,11 +1,9 @@
 <template>
-  <nav>
-      <ul>
-          <li>
-              sheet-pricelist
-          </li>
-      </ul>
-  </nav>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Sheet-pricelist</a>
+  </div>
+</nav>
 </template>
 
 <script>

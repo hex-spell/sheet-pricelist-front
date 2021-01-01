@@ -1,6 +1,6 @@
 <template>
-  <select name="category" id="category" v-model="state.category" @change="onChange">
-    <option value="" selected>Todas</option>
+  <select name="category" id="category" v-model="state.category" @change="onChange" class="form-select">
+    <option value="" selected>Todas las categorias</option>
     <option
       v-for="category in props.categories"
       :value="category.id"
