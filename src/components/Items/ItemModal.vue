@@ -10,7 +10,7 @@
       <form class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="itemModalLabel">
-            Editar: {{ item.name }}
+            {{ create ? "Crear Item" : `Editar: ${item.name}` }}
           </h5>
           <button
             type="button"
@@ -57,7 +57,7 @@
                 v-for="category in categories"
                 :value="category.id"
                 :key="category.id"
-                :selected="item.categoryId === category.id"
+                :selected="item.categoryId === category.id || create"
               >
                 {{ category.name }}
               </option>
@@ -86,6 +86,7 @@ export default {
     item: Object,
     id: String,
     categories: Array,
+    create: Boolean
   },
   setup(props) {
     return { props };

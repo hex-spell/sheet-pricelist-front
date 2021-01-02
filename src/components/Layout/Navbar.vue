@@ -35,6 +35,17 @@
               >Modificar categoría</a
             >
           </li>
+          <li>
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="#"
+              data-bs-toggle="modal"
+              :data-bs-target="props.createItemTarget"
+              @click="onCreateItemClick"
+              >Crear Item</a
+            >
+          </li>
         </ul>
       </div>
     </div>
@@ -46,10 +57,14 @@ export default {
   name: "Navbar",
   props: {
     createCategoryTarget: String,
-    modifyCategoryTarget: String
+    modifyCategoryTarget: String,
+    createItemTarget: String,
   },
-  setup(props) {
-    return { props };
+  setup(props, ctx) {
+    function onCreateItemClick() {
+      ctx.emit("createItemClick");
+    }
+    return { props, onCreateItemClick };
   },
 };
 </script>

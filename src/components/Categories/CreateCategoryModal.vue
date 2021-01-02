@@ -7,11 +7,9 @@
     aria-hidden="true"
   >
     <div class="modal-dialog">
-      <form class="modal-content">
+      <form class="modal-content" @submit.prevent="">
         <div class="modal-header">
-          <h5 class="modal-title" id="itemModalLabel">
-            Crear categoría
-          </h5>
+          <h5 class="modal-title" id="itemModalLabel">Crear categoría</h5>
           <button
             type="button"
             class="btn-close"
@@ -27,6 +25,7 @@
               class="form-control"
               id="inputName"
               required
+              v-model="state.name"
             />
           </div>
         </div>
@@ -38,7 +37,13 @@
           >
             Cerrar
           </button>
-          <button type="button" class="btn btn-primary">Guardar cambios</button>
+          <input
+            type="submit"
+            class="btn btn-primary"
+            data-bs-dismiss="modal"
+            value="Guardar cambios"
+            @click="onSubmit"
+          />
         </div>
       </form>
     </div>
@@ -46,13 +51,33 @@
 </template>
 
 <script>
+import { reactive } from "vue";
+import axios from "axios";
+import config from "../../config";
+
 export default {
   name: "CreateCategoryModal",
   props: {
     id: String,
   },
-  setup(props) {
-    return { props };
+  setup(props, ctx) {
+    const state = reactive({
+      name: "",
+    });
+
+    function onSubmit() {
+      if (state.name) {
+        axios
+          .post(`${config.aws_api}/categories`, {
+            name: state.name,
+          })
+          .then(() => {
+            ctx.emit("categoryPostSuccess");
+          })
+          .catch((e) => console.log("error", e));
+      }
+    }
+    return { props, onSubmit, state };
   },
 };
 </script>

@@ -2,6 +2,8 @@
   <Navbar
     createCategoryTarget="#createCategoryModal"
     modifyCategoryTarget="#modifyCategoryModal"
+    createItemTarget="#itemModal"
+    @createItemClick="onCreateItemClick"
   />
   <div class="container mt-3">
     <div class="card">
@@ -24,14 +26,13 @@
         </div>
       </div>
       <div class="card-body">
+        <div v-if="state.fetchingItems" class="spinner-border" role="status"></div>
         <ItemList
-          v-if="state.items.length>0"
+          v-else
           :items="state.items"
           @clickedItem="onClickedItem($event)"
           modalTarget="#itemModal"
         />
-        <div v-else class="spinner-border" role="status">
-        </div>
       </div>
     </div>
   </div>
@@ -39,11 +40,16 @@
     :item="state.currentItem"
     id="itemModal"
     :categories="state.categories"
+    :create="state.createItemMode"
   />
-  <CreateCategoryModal id="createCategoryModal" />
+  <CreateCategoryModal
+    id="createCategoryModal"
+    @categoryPostSuccess="onCategoryPostSuccess"
+  />
   <ModifyCategoryModal
     id="modifyCategoryModal"
     :categories="state.categories"
+    @categoryPostSuccess="onCategoryPostSuccess"
   />
 </template>
 
@@ -73,31 +79,58 @@ export default {
       categories: [],
       items: [],
       currentItem: {},
+      createItemMode: false,
+      fetchingItems: true,
     });
-    const { response: categories } = useFetch(
-      `${config.aws_api}/categories`,
-      {}
-    );
-    if (categories) {
-      state.categories = categories;
-    }
-    const { response: items } = useFetch(`${config.aws_api}/items`, {});
-    if (items) {
-      state.items = items;
-    }
+    const fetchCategories = () => {
+      const { response: categories } = useFetch(
+        `${config.aws_api}/categories`,
+        {}
+      );
+      if (categories) {
+        state.categories = categories;
+      }
+    };
+    fetchCategories();
+    const fetchItems = () => {
+      const { response: items, fetching: fetchingItems } = useFetch(
+        `${config.aws_api}/items`,
+        {}
+      );
+      if (items) {
+        state.items = items;
+        state.fetchingItems = fetchingItems;
+      }
+    };
+    fetchItems();
     function onChangeCategory(category) {
-      const { response: items } = useFetch(
+      const { response: items, fetching: fetchingItems } = useFetch(
         `${config.aws_api}/items?categoryId=${category}`,
         {}
       );
       if (items) {
         state.items = items;
+        state.fetchingItems = fetchingItems;
       }
     }
     function onClickedItem(item) {
       state.currentItem = item;
+      state.createItemMode = false;
     }
-    return { state, onChangeCategory, onClickedItem };
+    function onCreateItemClick() {
+      state.currentItem = {};
+      state.createItemMode = true;
+    }
+    function onCategoryPostSuccess() {
+      fetchCategories();
+    }
+    return {
+      state,
+      onChangeCategory,
+      onClickedItem,
+      onCreateItemClick,
+      onCategoryPostSuccess,
+    };
   },
 };
 </script>
