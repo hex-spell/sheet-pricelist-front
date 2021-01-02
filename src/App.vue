@@ -118,7 +118,7 @@ export default {
       selectedCategory: "",
     });
     const filteredItems = computed(() =>
-      state.items.filter((item) => item.name.includes(state.search))
+      state.items.filter((item) => item.name.toLowerCase().includes(state.search.toLowerCase()))
     );
     const fetchCategories = () => {
       const { response: categories } = useFetch(

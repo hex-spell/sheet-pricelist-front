@@ -7,7 +7,7 @@
     aria-hidden="true"
   >
     <div class="modal-dialog">
-      <form class="modal-content">
+      <form class="modal-content" @submit.prevent="onSubmit">
         <div class="modal-header">
           <h5 class="modal-title" id="itemModalLabel">
             {{ create ? "Crear Item" : `Editar: ${item.name}` }}
@@ -22,7 +22,13 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="inputCategory" class="form-label">Categoría</label>
-            <select name="category" id="inputCategory" class="form-select">
+            <select
+              name="category"
+              id="inputCategory"
+              class="form-select"
+              v-model="state.categoryId"
+              required
+            >
               <option
                 v-for="category in categories"
                 :value="category.id"
@@ -36,8 +42,8 @@
           <div class="mb-3">
             <label for="inputName" class="form-label">Nombre</label>
             <input
+              v-model="state.name"
               required
-              :value="item.name"
               type="text"
               class="form-control"
               id="inputName"
@@ -46,8 +52,8 @@
           <div class="mb-3">
             <label for="inputUnit" class="form-label">Unidad</label>
             <input
+              v-model="state.unit"
               required
-              :value="item.unit"
               type="text"
               class="form-control"
               id="inputUnit"
@@ -56,8 +62,8 @@
           <div class="mb-3">
             <label for="inputPrice" class="form-label">Precio</label>
             <input
+              v-model="state.price"
               required
-              :value="item.price"
               type="text"
               class="form-control"
               id="inputPrice"
@@ -72,7 +78,7 @@
           >
             Cerrar
           </button>
-          <button type="button" class="btn btn-primary">Guardar cambios</button>
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
         </div>
       </form>
     </div>
@@ -80,16 +86,41 @@
 </template>
 
 <script>
+import { reactive, watch } from "vue";
+
 export default {
   name: "ItemModal",
   props: {
     item: Object,
     id: String,
     categories: Array,
-    create: Boolean
+    create: Boolean,
   },
   setup(props) {
-    return { props };
+    const state = reactive({
+      name: props.item.name,
+      id: props.item.id,
+      categoryId: props.item.categoryId,
+      created: props.item.created,
+      unit: props.item.unit,
+      price: props.item.price,
+    });
+    watch(
+      () => props.item,
+      (item) => {
+        state.name = item.name;
+        state.id = item.id;
+        state.categoryId = item.categoryId;
+        state.created = item.created;
+        state.unit = item.unit;
+        state.price = item.price;
+      }
+    );
+    function onSubmit() {
+      console.log({...state});
+    }
+
+    return { props, onSubmit, state };
   },
 };
 </script>

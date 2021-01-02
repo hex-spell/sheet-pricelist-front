@@ -3,9 +3,12 @@
   <a href="#" class="list-group-item list-group-item-action" v-for="item in props.items" :key="item.id" @click="onItemClick(item)" data-bs-toggle="modal" :data-bs-target="props.modalTarget">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">{{item.name}}</h5>
-      <div>{{item.price}}</div>
+      <h4 class="text-success">{{item.price}}</h4>
     </div>
-    <p class="mb-1">{{item.unit}}</p>
+    <div class="d-flex w-100 justify-content-between">
+      <div class="mb-1">{{item.unit}}</div>
+      <small>{{item.created}}</small>
+    </div>
   </a>
 </div>
 </template>
