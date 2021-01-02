@@ -30,10 +30,10 @@
               required
             >
               <option
-                v-for="category in categories"
+                v-for="(category, index) in categories"
                 :value="category.id"
                 :key="category.id"
-                :selected="item.categoryId === category.id || create"
+                :selected="item.categoryId === category.id || (create && index === 0)"
               >
                 {{ category.name }}
               </option>
@@ -112,7 +112,7 @@ export default {
       (item) => {
         state.name = item.name;
         state.id = item.id;
-        state.categoryId = item.categoryId;
+        state.categoryId = item.categoryId || props.categories[0].id
         state.created = item.created;
         state.unit = item.unit;
         state.price = item.price;
