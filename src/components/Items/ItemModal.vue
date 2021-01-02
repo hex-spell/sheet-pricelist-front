@@ -78,7 +78,7 @@
           >
             Cerrar
           </button>
-          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <button @click="onSubmit" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Guardar cambios</button>
         </div>
       </form>
     </div>
@@ -87,6 +87,8 @@
 
 <script>
 import { reactive, watch } from "vue";
+import config from "../../config";
+import axios from "axios";
 
 export default {
   name: "ItemModal",
@@ -96,7 +98,7 @@ export default {
     categories: Array,
     create: Boolean,
   },
-  setup(props) {
+  setup(props, ctx) {
     const state = reactive({
       name: props.item.name,
       id: props.item.id,
@@ -117,7 +119,20 @@ export default {
       }
     );
     function onSubmit() {
-      console.log({...state});
+      if (props.create) {
+        axios.post(`${config.aws_api}/items`, {
+          ...state
+        }).then(()=>{
+          ctx.emit('itemPostSuccess');
+        })
+      } else {
+        axios.put(`${config.aws_api}/items`, {
+          ...props.item,
+          ...state
+        }).then(()=>{
+          ctx.emit('itemPostSuccess');
+        })
+      }
     }
 
     return { props, onSubmit, state };

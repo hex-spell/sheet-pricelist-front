@@ -44,7 +44,7 @@
           >
             Cerrar
           </button>
-          <input type="button" class="btn btn-primary" @click="onSubmit" value="Guardar cambios" data-bs-dismiss="modal"/>
+          <input type="submit" class="btn btn-primary" @click="onSubmit" value="Guardar cambios" data-bs-dismiss="modal"/>
         </div>
       </form>
     </div>

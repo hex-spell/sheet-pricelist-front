@@ -5,8 +5,8 @@
     createItemTarget="#itemModal"
     @createItemClick="onCreateItemClick"
   />
-  <div class="container mt-3">
-    <div class="card">
+  <div class="container mt-3 mb-3">
+    <div class="card main-card">
       <div class="card-header">
         <div class="input-group mb-2">
           <select
@@ -67,6 +67,7 @@
     id="itemModal"
     :categories="state.categories"
     :create="state.createItemMode"
+    @itemPostSuccess="onItemPostSuccess"
   />
   <CreateCategoryModal
     id="createCategoryModal"
@@ -162,6 +163,9 @@ export default {
     function onCategoryPostSuccess() {
       fetchCategories();
     }
+    function onItemPostSuccess() {
+      onChangeCategory()
+    }
     function deleteCategory() {
       axios
         .delete(`${config.aws_api}/categories`, {
@@ -181,6 +185,7 @@ export default {
       onCategoryPostSuccess,
       filteredItems,
       deleteCategory,
+      onItemPostSuccess
     };
   },
 };
