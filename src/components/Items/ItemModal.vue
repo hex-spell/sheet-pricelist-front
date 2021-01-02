@@ -21,6 +21,19 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
+            <label for="inputCategory" class="form-label">Categoría</label>
+            <select name="category" id="inputCategory" class="form-select">
+              <option
+                v-for="category in categories"
+                :value="category.id"
+                :key="category.id"
+                :selected="item.categoryId === category.id || create"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
             <label for="inputName" class="form-label">Nombre</label>
             <input
               required
@@ -49,19 +62,6 @@
               class="form-control"
               id="inputPrice"
             />
-          </div>
-          <div class="mb-3">
-            <label for="inputCategory" class="form-label">Categoría</label>
-            <select name="category" id="inputCategory" class="form-select">
-              <option
-                v-for="category in categories"
-                :value="category.id"
-                :key="category.id"
-                :selected="item.categoryId === category.id || create"
-              >
-                {{ category.name }}
-              </option>
-            </select>
           </div>
         </div>
         <div class="modal-footer">

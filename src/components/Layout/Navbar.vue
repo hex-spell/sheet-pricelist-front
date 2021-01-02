@@ -32,7 +32,7 @@
               href="#"
               data-bs-toggle="modal"
               :data-bs-target="props.modifyCategoryTarget"
-              >Modificar categoría</a
+              >Renombrar categoría</a
             >
           </li>
           <li>
@@ -46,6 +46,15 @@
               >Crear Item</a
             >
           </li>
+          <li>
+            <a
+              class="nav-link"
+              aria-current="page"
+              :href="`${config.aws_api}/generate`"
+              target="_blank"
+              >Generar PDF</a
+            >
+          </li>
         </ul>
       </div>
     </div>
@@ -53,6 +62,8 @@
 </template>
 
 <script>
+import config from "../../config";
+
 export default {
   name: "Navbar",
   props: {
@@ -64,7 +75,7 @@ export default {
     function onCreateItemClick() {
       ctx.emit("createItemClick");
     }
-    return { props, onCreateItemClick };
+    return { props, onCreateItemClick, config };
   },
 };
 </script>

@@ -9,7 +9,7 @@
     <div class="modal-dialog">
       <form class="modal-content" @submit.prevent="">
         <div class="modal-header">
-          <h5 class="modal-title" id="itemModalLabel">Modificar categoría</h5>
+          <h5 class="modal-title" id="itemModalLabel">Renombrar categoría</h5>
           <button
             type="button"
             class="btn-close"

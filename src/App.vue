@@ -8,25 +8,51 @@
   <div class="container mt-3">
     <div class="card">
       <div class="card-header">
-          <CategoriesSelect
-            :categories="state.categories"
-            @changeCategory="onChangeCategory"
-            style="min-width: 200px"
-            :includeAllCategoriesOption="true"
-            selected=""
-            class="mb-2"
-          />
-          <input
-            type="search"
-            aria-label="Buscar"
-            placeholder="Buscar..."
-            class="form-control"
-            style="min-width: 200px"
-            v-model="state.search"
-          />
+        <div class="input-group mb-2">
+          <select
+            name="category"
+            id="category"
+            @change="onChangeCategory"
+            class="form-select"
+            v-model="state.selectedCategory"
+          >
+            <option value="" selected>
+              Todas las categorias
+            </option>
+            <option
+              v-for="category in state.categories"
+              :value="category.id"
+              :key="category.id"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+          <button
+            data-bs-toggle="modal"
+            data-bs-target="#confirmDeleteCategory"
+            v-if="state.selectedCategory !== ''"
+            class="input-group-text"
+            id="basic-addon2"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+
+        <input
+          type="search"
+          aria-label="Buscar"
+          placeholder="Buscar..."
+          class="form-control"
+          style="min-width: 200px"
+          v-model="state.search"
+        />
       </div>
       <div class="card-body">
-        <div v-if="state.fetchingItems" class="spinner-border" role="status"></div>
+        <div
+          v-if="state.fetchingItems"
+          class="spinner-border"
+          role="status"
+        ></div>
         <ItemList
           v-else
           :items="filteredItems"
@@ -51,11 +77,17 @@
     :categories="state.categories"
     @categoryPostSuccess="onCategoryPostSuccess"
   />
+  <ConfirmActionModal
+    id="confirmDeleteCategory"
+    actionDescription="eliminar esta categoría"
+    actionConsequences="Todos los items que pertenezcan a ella serán eliminados de forma irreversible."
+    @confirm="deleteCategory"
+  />
 </template>
 
 <script>
 import Navbar from "./components/Layout/Navbar.vue";
-import CategoriesSelect from "./components/Inputs/CategoriesSelect.vue";
+import ConfirmActionModal from "./components/Layout/ConfirmActionModal.vue";
 import CreateCategoryModal from "./components/Categories/CreateCategoryModal.vue";
 import ModifyCategoryModal from "./components/Categories/ModifyCategoryModal.vue";
 import ItemList from "./components/Items/ItemList.vue";
@@ -63,16 +95,17 @@ import ItemModal from "./components/Items/ItemModal.vue";
 import { reactive, computed } from "vue";
 import useFetch from "./hooks/useFetch";
 import config from "./config";
+import axios from "axios";
 
 export default {
   name: "App",
   components: {
     Navbar,
-    CategoriesSelect,
     CreateCategoryModal,
     ItemList,
     ItemModal,
     ModifyCategoryModal,
+    ConfirmActionModal,
   },
   setup() {
     const state = reactive({
@@ -81,9 +114,12 @@ export default {
       currentItem: {},
       createItemMode: false,
       fetchingItems: true,
-      search: ''
+      search: "",
+      selectedCategory: "",
     });
-    const filteredItems = computed(()=>state.items.filter((item)=>item.name.includes(state.search)))
+    const filteredItems = computed(() =>
+      state.items.filter((item) => item.name.includes(state.search))
+    );
     const fetchCategories = () => {
       const { response: categories } = useFetch(
         `${config.aws_api}/categories`,
@@ -105,9 +141,9 @@ export default {
       }
     };
     fetchItems();
-    function onChangeCategory(category) {
+    function onChangeCategory() {
       const { response: items, fetching: fetchingItems } = useFetch(
-        `${config.aws_api}/items?categoryId=${category}`,
+        `${config.aws_api}/items?categoryId=${state.selectedCategory}`,
         {}
       );
       if (items) {
@@ -126,13 +162,25 @@ export default {
     function onCategoryPostSuccess() {
       fetchCategories();
     }
+    function deleteCategory() {
+      axios
+        .delete(`${config.aws_api}/categories`, {
+          data: { id: state.selectedCategory },
+        })
+        .then(() => {
+          fetchCategories();
+          fetchItems();
+          state.selectedCategory = "";
+        });
+    }
     return {
       state,
       onChangeCategory,
       onClickedItem,
       onCreateItemClick,
       onCategoryPostSuccess,
-      filteredItems
+      filteredItems,
+      deleteCategory,
     };
   },
 };
