@@ -9,9 +9,7 @@
     <div class="modal-dialog">
       <form class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="itemModalLabel">
-            Editar: {{ item.name }}
-          </h5>
+          <h5 class="modal-title" id="itemModalLabel">Modificar categoría</h5>
           <button
             type="button"
             class="btn-close"
@@ -21,47 +19,21 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="inputName" class="form-label">Nombre</label>
-            <input
-              required
-              :value="item.name"
-              type="text"
-              class="form-control"
-              id="inputName"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="inputUnit" class="form-label">Unidad</label>
-            <input
-              required
-              :value="item.unit"
-              type="text"
-              class="form-control"
-              id="inputUnit"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="inputPrice" class="form-label">Precio</label>
-            <input
-              required
-              :value="item.price"
-              type="text"
-              class="form-control"
-              id="inputPrice"
-            />
-          </div>
-          <div class="mb-3">
             <label for="inputCategory" class="form-label">Categoría</label>
             <select name="category" id="inputCategory" class="form-select">
               <option
-                v-for="category in categories"
+                v-for="(category, index) in categories"
                 :value="category.id"
                 :key="category.id"
-                :selected="item.categoryId === category.id"
+                :selected="index === 0"
               >
                 {{ category.name }}
               </option>
             </select>
+          </div>
+          <div class="mb-3">
+            <label for="inputName" class="form-label">Nuevo nombre</label>
+            <input type="text" class="form-control" id="inputName" required />
           </div>
         </div>
         <div class="modal-footer">
@@ -81,9 +53,8 @@
 
 <script>
 export default {
-  name: "ItemModal",
+  name: "ModifyCategoryModal",
   props: {
-    item: Object,
     id: String,
     categories: Array,
   },

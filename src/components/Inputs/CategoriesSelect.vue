@@ -1,6 +1,6 @@
 <template>
   <select name="category" id="category" v-model="state.category" @change="onChange" class="form-select">
-    <option value="" selected>Todas las categorias</option>
+    <option value="" selected v-if="props.includeAllCategoriesOption">Todas las categorias</option>
     <option
       v-for="category in props.categories"
       :value="category.id"
@@ -18,10 +18,12 @@ export default {
   name: "CategoriesSelect",
   props: {
     categories: Array,
+    includeAllCategoriesOption: Boolean,
+    selected: String
   },
   setup(props, ctx) {
     const state = reactive({
-      category: "",
+      category: props.selected || "",
     });
     function onChange(){
       ctx.emit('changeCategory',state.category);

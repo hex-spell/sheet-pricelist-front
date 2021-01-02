@@ -10,7 +10,7 @@
       <form class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="itemModalLabel">
-            Editar: {{ item.name }}
+            Crear categoría
           </h5>
           <button
             type="button"
@@ -23,45 +23,11 @@
           <div class="mb-3">
             <label for="inputName" class="form-label">Nombre</label>
             <input
-              required
-              :value="item.name"
               type="text"
               class="form-control"
               id="inputName"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="inputUnit" class="form-label">Unidad</label>
-            <input
               required
-              :value="item.unit"
-              type="text"
-              class="form-control"
-              id="inputUnit"
             />
-          </div>
-          <div class="mb-3">
-            <label for="inputPrice" class="form-label">Precio</label>
-            <input
-              required
-              :value="item.price"
-              type="text"
-              class="form-control"
-              id="inputPrice"
-            />
-          </div>
-          <div class="mb-3">
-            <label for="inputCategory" class="form-label">Categoría</label>
-            <select name="category" id="inputCategory" class="form-select">
-              <option
-                v-for="category in categories"
-                :value="category.id"
-                :key="category.id"
-                :selected="item.categoryId === category.id"
-              >
-                {{ category.name }}
-              </option>
-            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -81,11 +47,9 @@
 
 <script>
 export default {
-  name: "ItemModal",
+  name: "CreateCategoryModal",
   props: {
-    item: Object,
     id: String,
-    categories: Array,
   },
   setup(props) {
     return { props };
