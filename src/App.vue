@@ -8,13 +8,13 @@
   <div class="container mt-3">
     <div class="card">
       <div class="card-header">
-        <div class="input-group">
           <CategoriesSelect
             :categories="state.categories"
             @changeCategory="onChangeCategory"
             style="min-width: 200px"
             :includeAllCategoriesOption="true"
             selected=""
+            class="mb-2"
           />
           <input
             type="search"
@@ -22,14 +22,14 @@
             placeholder="Buscar..."
             class="form-control"
             style="min-width: 200px"
+            v-model="state.search"
           />
-        </div>
       </div>
       <div class="card-body">
         <div v-if="state.fetchingItems" class="spinner-border" role="status"></div>
         <ItemList
           v-else
-          :items="state.items"
+          :items="filteredItems"
           @clickedItem="onClickedItem($event)"
           modalTarget="#itemModal"
         />
@@ -60,7 +60,7 @@ import CreateCategoryModal from "./components/Categories/CreateCategoryModal.vue
 import ModifyCategoryModal from "./components/Categories/ModifyCategoryModal.vue";
 import ItemList from "./components/Items/ItemList.vue";
 import ItemModal from "./components/Items/ItemModal.vue";
-import { reactive } from "vue";
+import { reactive, computed } from "vue";
 import useFetch from "./hooks/useFetch";
 import config from "./config";
 
@@ -81,7 +81,9 @@ export default {
       currentItem: {},
       createItemMode: false,
       fetchingItems: true,
+      search: ''
     });
+    const filteredItems = computed(()=>state.items.filter((item)=>item.name.includes(state.search)))
     const fetchCategories = () => {
       const { response: categories } = useFetch(
         `${config.aws_api}/categories`,
@@ -130,6 +132,7 @@ export default {
       onClickedItem,
       onCreateItemClick,
       onCategoryPostSuccess,
+      filteredItems
     };
   },
 };
