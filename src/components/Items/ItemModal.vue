@@ -9,9 +9,14 @@
     <div class="modal-dialog">
       <form class="modal-content" @submit.prevent="onSubmit">
         <div class="modal-header">
-          <h5 class="modal-title" id="itemModalLabel">
+          <h5
+            class="modal-title"
+            id="itemModalLabel"
+            v-if="props.categories.length > 0"
+          >
             {{ create ? "Crear Item" : `Editar: ${item.name}` }}
           </h5>
+          <h5 class="modal-title" id="itemModalLabel" v-else>Crear Item</h5>
           <button
             type="button"
             class="btn-close"
@@ -19,7 +24,7 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" v-if="props.categories.length > 0">
           <div class="mb-3">
             <label for="inputCategory" class="form-label">Categoría</label>
             <select
@@ -33,7 +38,9 @@
                 v-for="(category, index) in categories"
                 :value="category.id"
                 :key="category.id"
-                :selected="item.categoryId === category.id || (create && index === 0)"
+                :selected="
+                  item.categoryId === category.id || (create && index === 0)
+                "
               >
                 {{ category.name }}
               </option>
@@ -70,6 +77,9 @@
             />
           </div>
         </div>
+        <div class="alert-warning modal-body" v-else>
+          Antes de poder crear un item, debes crear una categoría.
+        </div>
         <div class="modal-footer">
           <button
             type="button"
@@ -78,7 +88,15 @@
           >
             Cerrar
           </button>
-          <button @click="onSubmit" type="submit" class="btn btn-primary" data-bs-dismiss="modal">Guardar cambios</button>
+          <button
+            @click="onSubmit"
+            type="submit"
+            class="btn btn-primary"
+            data-bs-dismiss="modal"
+            v-if="props.categories.length > 0"
+          >
+            Guardar cambios
+          </button>
         </div>
       </form>
     </div>
@@ -112,26 +130,33 @@ export default {
       (item) => {
         state.name = item.name;
         state.id = item.id;
-        state.categoryId = item.categoryId || props.categories[0].id
+        state.categoryId = item.categoryId || props.categories[0].id;
         state.created = item.created;
         state.unit = item.unit;
         state.price = item.price;
       }
     );
     function onSubmit() {
-      if (props.create) {
-        axios.post(`${config.aws_api}/items`, {
-          ...state
-        }).then(()=>{
-          ctx.emit('itemPostSuccess');
-        })
-      } else {
-        axios.put(`${config.aws_api}/items`, {
-          ...props.item,
-          ...state
-        }).then(()=>{
-          ctx.emit('itemPostSuccess');
-        })
+      const { name, categoryId, unit, price } = state;
+      if (name && categoryId && unit && price) {
+        if (props.create) {
+          axios
+            .post(`${config.aws_api}/items`, {
+              ...state,
+            })
+            .then(() => {
+              ctx.emit("itemPostSuccess");
+            });
+        } else {
+          axios
+            .put(`${config.aws_api}/items`, {
+              ...props.item,
+              ...state,
+            })
+            .then(() => {
+              ctx.emit("itemPostSuccess");
+            });
+        }
       }
     }
 

@@ -6,19 +6,21 @@
     @createItemClick="onCreateItemClick"
   />
   <div class="container mt-3 mb-3">
-    <div class="card main-card">
+    <div
+      class="spinner-border"
+      role="status"
+      v-if="state.fetchingCategories"
+    ></div>
+    <div class="card main-card" v-if="!state.fetchingCategories && state.categories.length > 0">
       <div class="card-header">
         <div class="input-group mb-2">
           <select
             name="category"
             id="category"
-            @change="onChangeCategory"
             class="form-select"
             v-model="state.selectedCategory"
+            @change="fetchItemsByCategory(state.selectedCategory)"
           >
-            <option value="" selected>
-              Todas las categorias
-            </option>
             <option
               v-for="category in state.categories"
               :value="category.id"
@@ -49,17 +51,27 @@
       </div>
       <div class="card-body">
         <div
-          v-if="state.fetchingItems"
+          v-if="state.fetchingItems && state.items.length === 0"
           class="spinner-border"
           role="status"
         ></div>
+        <div
+          class="alert alert-warning"
+          role="alert"
+          v-else-if="!state.fetchingItems && state.items.length === 0"
+        >
+          No se encontraron items en esta categoría, prueba creando uno.
+        </div>
         <ItemList
-          v-else
+          v-else-if="!state.fetchingItems && state.items.length > 0"
           :items="filteredItems"
           @clickedItem="onClickedItem($event)"
           modalTarget="#itemModal"
         />
       </div>
+    </div>
+    <div class="alert alert-warning" role="alert" v-if="!state.fetchingCategories && state.categories.length === 0">
+      Antes de comenzar, crea una categoría.
     </div>
   </div>
   <ItemModal
@@ -93,7 +105,7 @@ import CreateCategoryModal from "./components/Categories/CreateCategoryModal.vue
 import ModifyCategoryModal from "./components/Categories/ModifyCategoryModal.vue";
 import ItemList from "./components/Items/ItemList.vue";
 import ItemModal from "./components/Items/ItemModal.vue";
-import { reactive, computed } from "vue";
+import { reactive, computed, watchEffect } from "vue";
 import useFetch from "./hooks/useFetch";
 import config from "./config";
 import axios from "axios";
@@ -115,36 +127,28 @@ export default {
       currentItem: {},
       createItemMode: false,
       fetchingItems: true,
+      fetchingCategories: true,
       search: "",
       selectedCategory: "",
     });
     const filteredItems = computed(() =>
-      state.items.filter((item) => item.name.toLowerCase().includes(state.search.toLowerCase()))
+      state.items.filter((item) =>
+        item.name.toLowerCase().includes(state.search.toLowerCase())
+      )
     );
     const fetchCategories = () => {
-      const { response: categories } = useFetch(
+      const { response: categories, fetching: fetchingCategories } = useFetch(
         `${config.aws_api}/categories`,
         {}
       );
       if (categories) {
         state.categories = categories;
+        state.fetchingCategories = fetchingCategories;
       }
     };
-    fetchCategories();
-    const fetchItems = () => {
+    function fetchItemsByCategory(category) {
       const { response: items, fetching: fetchingItems } = useFetch(
-        `${config.aws_api}/items`,
-        {}
-      );
-      if (items) {
-        state.items = items;
-        state.fetchingItems = fetchingItems;
-      }
-    };
-    fetchItems();
-    function onChangeCategory() {
-      const { response: items, fetching: fetchingItems } = useFetch(
-        `${config.aws_api}/items?categoryId=${state.selectedCategory}`,
+        `${config.aws_api}/items?categoryId=${category}`,
         {}
       );
       if (items) {
@@ -152,6 +156,16 @@ export default {
         state.fetchingItems = fetchingItems;
       }
     }
+    watchEffect(() => {
+      if (
+        state.categories &&
+        state.categories[0] &&
+        state.selectedCategory === ""
+      ) {
+        state.selectedCategory = state.categories[0].id;
+        fetchItemsByCategory(state.selectedCategory);
+      }
+    });
     function onClickedItem(item) {
       state.currentItem = item;
       state.createItemMode = false;
@@ -164,7 +178,7 @@ export default {
       fetchCategories();
     }
     function onItemPostSuccess() {
-      onChangeCategory()
+      fetchItemsByCategory(state.selectedCategory);
     }
     function deleteCategory() {
       axios
@@ -173,19 +187,19 @@ export default {
         })
         .then(() => {
           fetchCategories();
-          fetchItems();
           state.selectedCategory = "";
         });
     }
+    fetchCategories();
     return {
       state,
-      onChangeCategory,
       onClickedItem,
       onCreateItemClick,
       onCategoryPostSuccess,
       filteredItems,
       deleteCategory,
-      onItemPostSuccess
+      onItemPostSuccess,
+      fetchItemsByCategory,
     };
   },
 };

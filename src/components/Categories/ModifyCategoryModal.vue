@@ -17,10 +17,17 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" v-if="props.categories.length > 0">
           <div class="mb-3">
             <label for="inputCategory" class="form-label">Categoría</label>
-            <select name="category" id="inputCategory" class="form-select" v-model="state.id" required @change="onCategoryChange">
+            <select
+              name="category"
+              id="inputCategory"
+              class="form-select"
+              v-model="state.id"
+              required
+              @change="onCategoryChange"
+            >
               <option
                 v-for="(category, index) in categories"
                 :value="category.id"
@@ -33,8 +40,17 @@
           </div>
           <div class="mb-3">
             <label for="inputName" class="form-label">Nuevo nombre</label>
-            <input type="text" class="form-control" id="inputName" required v-model="state.name"/>
+            <input
+              type="text"
+              class="form-control"
+              id="inputName"
+              required
+              v-model="state.name"
+            />
           </div>
+        </div>
+        <div class="modal-body alert-warning" v-else>
+          Antes de poder modificar una categoría, debes crear una.
         </div>
         <div class="modal-footer">
           <button
@@ -44,7 +60,14 @@
           >
             Cerrar
           </button>
-          <input type="submit" class="btn btn-primary" @click="onSubmit" value="Guardar cambios" data-bs-dismiss="modal"/>
+          <input
+            type="submit"
+            class="btn btn-primary"
+            @click="onSubmit"
+            value="Guardar cambios"
+            v-if="props.categories.length > 0"
+            data-bs-dismiss="modal"
+          />
         </div>
       </form>
     </div>
@@ -52,7 +75,7 @@
 </template>
 
 <script>
-import { reactive } from "vue";
+import { reactive, watchEffect } from "vue";
 import axios from "axios";
 import config from "../../config";
 
@@ -64,11 +87,17 @@ export default {
   },
   setup(props, ctx) {
     const state = reactive({
-      id: '',
-      name: '',
+      id: "",
+      name: "",
+    });
+    watchEffect(() => {
+      if (!state.id && props.categories && props.categories[0]) {
+        state.id = props.categories[0].id;
+        state.name = props.categories[0].name;
+      }
     });
     function onSubmit() {
-      if (state.id&&state.name){
+      if (state.id && state.name) {
         axios
           .put(`${config.aws_api}/categories`, {
             id: state.id,
@@ -81,7 +110,9 @@ export default {
       }
     }
     function onCategoryChange() {
-      state.name = props.categories.filter((category)=>category.id===state.id)[0].name;
+      state.name = props.categories.filter(
+        (category) => category.id === state.id
+      )[0].name;
     }
     return { props, state, onSubmit, onCategoryChange };
   },
