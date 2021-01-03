@@ -71,7 +71,7 @@
       </div>
     </div>
     <div class="alert alert-warning" role="alert" v-if="!state.fetchingCategories && state.categories.length === 0">
-      Antes de comenzar, crea una categoría.
+      Antes de comenzar, crea una categoría desde el menu de la barra de navegación.
     </div>
   </div>
   <ItemModal
