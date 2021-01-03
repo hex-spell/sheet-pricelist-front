@@ -82,6 +82,20 @@
         </div>
         <div class="modal-footer">
           <button
+            @click="onDelete"
+            type="submit"
+            class="btn btn-danger"
+            data-bs-dismiss="modal"
+            v-if="props.categories.length > 0 && state.created"
+          >
+            Eliminar
+          </button>
+          <div
+            class="spacer"
+            v-if="props.categories.length > 0 && state.created"
+          ></div>
+          <button
+            v-else
             type="button"
             class="btn btn-secondary"
             data-bs-dismiss="modal"
@@ -159,11 +173,25 @@ export default {
         }
       }
     }
-
-    return { props, onSubmit, state };
+    function onDelete() {
+      const { created, id } = state;
+      if (created && id) {
+        axios
+          .delete(`${config.aws_api}/items`, {
+            data: {created, id}
+          })
+          .then(() => {
+            ctx.emit("itemPostSuccess");
+          });
+      }
+    }
+    return { props, onSubmit, onDelete, state };
   },
 };
 </script>
 
 <style>
+.spacer {
+  flex-grow: 1;
+}
 </style>
