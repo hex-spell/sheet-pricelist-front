@@ -54,6 +54,7 @@
               type="text"
               class="form-control"
               id="inputName"
+              autocomplete="off"
             />
           </div>
           <div class="mb-3">
@@ -64,9 +65,10 @@
               type="text"
               class="form-control"
               id="inputUnit"
+              autocomplete="off"
             />
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="inputPrice" class="form-label">Precio</label>
             <input
               v-model="state.price"
@@ -74,6 +76,20 @@
               type="text"
               class="form-control"
               id="inputPrice"
+            />
+          </div> -->
+          <label for="inputPrice" class="form-label">Precio</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text">$</div>
+            </div>
+            <input
+              v-model="state.price"
+              required
+              type="text"
+              class="form-control"
+              id="inputPrice"
+              autocomplete="off"
             />
           </div>
         </div>
@@ -178,7 +194,7 @@ export default {
       if (created && id) {
         axios
           .delete(`${config.aws_api}/items`, {
-            data: {created, id}
+            data: { created, id },
           })
           .then(() => {
             ctx.emit("itemPostSuccess");
